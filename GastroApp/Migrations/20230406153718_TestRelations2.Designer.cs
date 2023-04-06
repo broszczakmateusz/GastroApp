@@ -3,6 +3,7 @@ using System;
 using GastroApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    partial class GastroAppContextModelSnapshot : ModelSnapshot
+    [Migration("20230406153718_TestRelations2")]
+    partial class TestRelations2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,7 +86,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 40, 26, 976, DateTimeKind.Utc).AddTicks(173));
+                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 37, 18, 361, DateTimeKind.Utc).AddTicks(6130));
 
                     b.Property<bool>("IsPaid")
                         .ValueGeneratedOnAdd()
@@ -133,7 +136,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 40, 26, 977, DateTimeKind.Utc).AddTicks(3601));
+                        .HasDefaultValue(new DateTime(2023, 4, 6, 17, 37, 18, 362, DateTimeKind.Local).AddTicks(7700));
 
                     b.HasKey("OrderId", "MealId");
 
