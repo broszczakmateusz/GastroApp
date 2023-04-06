@@ -3,6 +3,7 @@ using System;
 using GastroApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    partial class GastroAppContextModelSnapshot : ModelSnapshot
+    [Migration("20230406122820_UpdatedCreatedTabelsMigration")]
+    partial class UpdatedCreatedTabelsMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,11 +61,9 @@ namespace GastroApp.Migrations
                         .HasColumnType("text");
 
                     b.Property<double>("Price")
-                        .HasPrecision(7, 2)
                         .HasColumnType("double precision");
 
                     b.Property<double>("VATRate")
-                        .HasPrecision(5, 2)
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
@@ -79,14 +80,10 @@ namespace GastroApp.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 16, 11, 612, DateTimeKind.Local).AddTicks(4746));
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsPaid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("PaidDateTime")
                         .HasColumnType("timestamp with time zone");
@@ -95,10 +92,7 @@ namespace GastroApp.Migrations
                         .HasColumnType("integer");
 
                     b.Property<float>("TotalPrice")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(7, 2)
-                        .HasColumnType("real")
-                        .HasDefaultValue(0f);
+                        .HasColumnType("real");
 
                     b.Property<DateTime?>("UpdatedDateTime")
                         .HasColumnType("timestamp with time zone");
@@ -120,13 +114,10 @@ namespace GastroApp.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Annotation")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 16, 11, 612, DateTimeKind.Local).AddTicks(6869));
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("OrderId", "MealId");
 
@@ -159,9 +150,7 @@ namespace GastroApp.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsTaken")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -3,6 +3,7 @@ using System;
 using GastroApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    partial class GastroAppContextModelSnapshot : ModelSnapshot
+    [Migration("20230406131443_CreatedColumnsConstraints")]
+    partial class CreatedColumnsConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +84,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 16, 11, 612, DateTimeKind.Local).AddTicks(4746));
+                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 14, 42, 968, DateTimeKind.Local).AddTicks(3915));
 
                     b.Property<bool>("IsPaid")
                         .ValueGeneratedOnAdd()
@@ -96,7 +99,6 @@ namespace GastroApp.Migrations
 
                     b.Property<float>("TotalPrice")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(7, 2)
                         .HasColumnType("real")
                         .HasDefaultValue(0f);
 
@@ -126,7 +128,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 16, 11, 612, DateTimeKind.Local).AddTicks(6869));
+                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 14, 42, 968, DateTimeKind.Local).AddTicks(7584));
 
                     b.HasKey("OrderId", "MealId");
 
