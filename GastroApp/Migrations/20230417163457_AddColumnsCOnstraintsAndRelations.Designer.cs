@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    [Migration("20230406152116_CreatedRelations")]
-    partial class CreatedRelations
+    [Migration("20230417163457_AddColumnsCOnstraintsAndRelations")]
+    partial class AddColumnsCOnstraintsAndRelations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,7 +86,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 17, 21, 16, 567, DateTimeKind.Local).AddTicks(7980));
+                        .HasDefaultValue(new DateTime(2023, 4, 17, 16, 34, 57, 388, DateTimeKind.Utc).AddTicks(7763));
 
                     b.Property<bool>("IsPaid")
                         .ValueGeneratedOnAdd()
@@ -136,7 +136,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 17, 21, 16, 570, DateTimeKind.Local).AddTicks(4592));
+                        .HasDefaultValue(new DateTime(2023, 4, 17, 16, 34, 57, 389, DateTimeKind.Utc).AddTicks(9448));
 
                     b.HasKey("OrderId", "MealId");
 

@@ -30,10 +30,15 @@ namespace GastroApp.Data
                 eb.Property(u => u.FirstName).IsRequired();
                 eb.Property(u => u.LastName).IsRequired();
             });
+
             builder.Entity<Room>(eb =>
             {
                 eb.Property(r => r.Name).IsRequired();
+                eb.HasMany(r => r.Tables)
+                .WithOne(t => t.Room)
+                .HasForeignKey(t => t.RoomId);
             });
+
             builder.Entity<Table>(eb =>
             {
                 eb.HasKey(t => t.Id);
@@ -41,11 +46,8 @@ namespace GastroApp.Data
                 eb.Property(t => t.RoomId).IsRequired();
                 eb.Property(t => t.NumberOfSeats).IsRequired();
                 eb.Property(t => t.IsTaken).HasDefaultValue(false);
-
-                eb.HasOne(r => r.Room)
-                .WithMany(t => t.Tables)
-                .HasForeignKey(t => t.RoomId);
             });
+
             builder.Entity<Category>(eb =>
             {
                 eb.HasKey(c => c.Id);
@@ -55,6 +57,7 @@ namespace GastroApp.Data
                 .WithOne(c => c.Category)
                 .HasForeignKey(c => c.CategoryId);
             });
+
             builder.Entity<Meal>(eb =>
             {
                 eb.HasKey(m => m.Id);
@@ -62,20 +65,16 @@ namespace GastroApp.Data
                 eb.Property(m => m.Price).IsRequired().HasPrecision(7, 2);
                 eb.Property(m => m.VATRate).IsRequired().HasPrecision(5, 2);
                 eb.Property(m => m.CategoryId).IsRequired();
-
-                //eb.HasOne(m => m.Category)
-                //.WithMany(m => m.Meals)
-                //.HasForeignKey(m => m.CategoryId);
             });
+
             builder.Entity<Order>(eb =>
             {
                 eb.HasKey(o => o.Id);
                 eb.Property(o => o.TableId).IsRequired();
                 eb.Property(o => o.UserId).IsRequired();
-                eb.Property(o => o.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow);
+                eb.Property(o => o.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow.ToUniversalTime());
                 eb.Property(o => o.IsPaid).HasDefaultValue(false);
                 eb.Property(o => o.TotalPrice).HasDefaultValue(0).HasPrecision(7, 2);
-
                 eb.HasOne(o => o.Table)
                 .WithMany(o => o.Orders)
                 .HasForeignKey(o => o.TableId);
@@ -99,7 +98,7 @@ namespace GastroApp.Data
                     {
                         om.HasKey(x => new { x.OrderId, x.MealId });
                         om.Property(x => x.Annotation).HasMaxLength(255);
-                        om.Property(x => x.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow);
+                        om.Property(x => x.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow.ToUniversalTime());
                     }
                     );
             });

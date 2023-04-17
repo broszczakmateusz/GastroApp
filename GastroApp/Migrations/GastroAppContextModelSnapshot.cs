@@ -83,7 +83,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 40, 26, 976, DateTimeKind.Utc).AddTicks(173));
+                        .HasDefaultValue(new DateTime(2023, 4, 17, 16, 34, 57, 388, DateTimeKind.Utc).AddTicks(7763));
 
                     b.Property<bool>("IsPaid")
                         .ValueGeneratedOnAdd()
@@ -133,7 +133,7 @@ namespace GastroApp.Migrations
                     b.Property<DateTime>("CreatedDateTime")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValue(new DateTime(2023, 4, 6, 15, 40, 26, 977, DateTimeKind.Utc).AddTicks(3601));
+                        .HasDefaultValue(new DateTime(2023, 4, 17, 16, 34, 57, 389, DateTimeKind.Utc).AddTicks(9448));
 
                     b.HasKey("OrderId", "MealId");
 
