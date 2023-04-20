@@ -3,6 +3,7 @@ using System;
 using GastroApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    partial class GastroAppContextModelSnapshot : ModelSnapshot
+    [Migration("20230418210735_FixCreatedDateTIme")]
+    partial class FixCreatedDateTIme
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,9 +96,6 @@ namespace GastroApp.Migrations
                     b.Property<DateTime?>("PaidDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("PaymentMethodId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("TableId")
                         .HasColumnType("integer");
 
@@ -105,18 +105,14 @@ namespace GastroApp.Migrations
                         .HasColumnType("real")
                         .HasDefaultValue(0f);
 
-                    b.Property<DateTime>("UpdatedDateTime")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("now()");
+                    b.Property<DateTime?>("UpdatedDateTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PaymentMethodId");
 
                     b.HasIndex("TableId");
 
@@ -147,23 +143,6 @@ namespace GastroApp.Migrations
                     b.HasIndex("MealId");
 
                     b.ToTable("OrderedMeals");
-                });
-
-            modelBuilder.Entity("GastroApp.Models.PaymentMethod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("GastroApp.Models.Room", b =>
@@ -434,10 +413,6 @@ namespace GastroApp.Migrations
 
             modelBuilder.Entity("GastroApp.Models.Order", b =>
                 {
-                    b.HasOne("GastroApp.Models.PaymentMethod", "PaymentMethod")
-                        .WithMany("Orders")
-                        .HasForeignKey("PaymentMethodId");
-
                     b.HasOne("GastroApp.Models.Table", "Table")
                         .WithMany("Orders")
                         .HasForeignKey("TableId")
@@ -449,8 +424,6 @@ namespace GastroApp.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PaymentMethod");
 
                     b.Navigation("Table");
 
@@ -541,11 +514,6 @@ namespace GastroApp.Migrations
             modelBuilder.Entity("GastroApp.Models.Category", b =>
                 {
                     b.Navigation("Meals");
-                });
-
-            modelBuilder.Entity("GastroApp.Models.PaymentMethod", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("GastroApp.Models.Room", b =>

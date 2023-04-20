@@ -1,0 +1,13 @@
+﻿@using System.Globalization;
+@model DateTime?
+@if (Model.HasValue)
+{
+    <span>
+        @Model.Value.ToLocalTime()
+    </span>
+}
+else
+{
+    <span></span>
+}
+

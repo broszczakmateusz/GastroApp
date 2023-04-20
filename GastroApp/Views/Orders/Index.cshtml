@@ -1,0 +1,60 @@
+﻿@using System.Globalization;
+@model IEnumerable<GastroApp.Models.Order>
+
+@{
+    ViewData["Title"] = "Current orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Orders</h1>
+
+<p>
+    <a asp-action="Create">New order</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Room
+            </th>
+            <th>
+                Table
+            </th>
+            <th>
+                Waiter
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Updated
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Table.Room.Name)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.Table.Name) 
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.FirstName) @Html.DisplayFor(modelItem => item.User.LastName)
+            </td>
+            <td>
+                    @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedDateTime)
+            </td>
+
+            <td>
+                <a asp-action="SelectedOrder" asp-route-id="@item.Id">Select</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

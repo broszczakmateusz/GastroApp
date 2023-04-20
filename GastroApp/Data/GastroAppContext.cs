@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Reflection.Emit;
 
 namespace GastroApp.Data
@@ -15,6 +16,7 @@ namespace GastroApp.Data
         public DbSet<Meal> Meals { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderedMeal> OrderedMeals { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public GastroAppContext(DbContextOptions<GastroAppContext> options)
             : base(options)
         {
@@ -23,6 +25,14 @@ namespace GastroApp.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<PaymentMethod>(eb =>
+            {
+                eb.HasKey(p => p.Id);
+                eb.Property(p => p.Name).IsRequired();
+                eb.HasMany(p => p.Orders)
+                .WithOne(o => o.PaymentMethod);
+            });
 
             builder.Entity<User>(eb =>
             {
@@ -72,7 +82,8 @@ namespace GastroApp.Data
                 eb.HasKey(o => o.Id);
                 eb.Property(o => o.TableId).IsRequired();
                 eb.Property(o => o.UserId).IsRequired();
-                eb.Property(o => o.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow.ToUniversalTime());
+                eb.Property(o => o.CreatedDateTime).IsRequired().HasDefaultValueSql("now()");
+                eb.Property(o => o.UpdatedDateTime).IsRequired().HasDefaultValueSql("now()");
                 eb.Property(o => o.IsPaid).HasDefaultValue(false);
                 eb.Property(o => o.TotalPrice).HasDefaultValue(0).HasPrecision(7, 2);
                 eb.HasOne(o => o.Table)
@@ -98,7 +109,7 @@ namespace GastroApp.Data
                     {
                         om.HasKey(x => new { x.OrderId, x.MealId });
                         om.Property(x => x.Annotation).HasMaxLength(255);
-                        om.Property(x => x.CreatedDateTime).IsRequired().HasDefaultValue(DateTime.UtcNow.ToUniversalTime());
+                        om.Property(x => x.CreatedDateTime).IsRequired().HasDefaultValueSql("now()");
                     }
                     );
             });

@@ -1,0 +1,44 @@
+﻿@model GastroApp.Models.Order
+
+@{
+    ViewData["Title"] = "Selected Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+    <div class="row">
+        <div class="col-md-6">
+            @Html.DisplayFor(model => model.Table.Room.Name),
+            @Html.DisplayFor(model => model.Table.Name)
+        </div>
+        <div class="col-md-6">
+            Total <b>@Html.DisplayFor(model => model.TotalPrice)</b>
+        </div>
+    </div>
+
+    <hr />
+<div>
+    <dl class="row">
+        <dt class = "col-sm-2">
+            Waiter
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.User.FirstName) @Html.DisplayFor(model => model.User.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            Created
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDateTime)
+        </dd>
+        <dt class="col-sm-2">
+            Last change
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UpdatedDateTime)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="ChangeTable" asp-route-id="@Model?.Id">Change table</a> |
+    <a asp-action="CloseOrder" asp-route-id="@Model?.Id">Close order</a> |
+    <a asp-action="Index">Back to orders</a>
+</div>

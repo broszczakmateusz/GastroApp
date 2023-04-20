@@ -9,5 +9,6 @@
         public int RoomId { get; set; }
         public Room Room { get; set; }
         public List<Order> Orders { get; set; } = new List<Order>();
+        public string RoomAndTable => $"{Room.Name} {Name}";
     }
 }
