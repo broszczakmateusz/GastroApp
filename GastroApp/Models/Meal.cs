@@ -9,6 +9,8 @@
         public float VATRate { get; set;}
         public int CategoryId { get; set; }
         public Category Category { get; set; }
-        public List<Order> Orders { get; set; } = new List<Order>(); 
+        public List<Order> Orders { get; set; } = new();
+        public List<OrderedMeal> OrderedMeals { get; set; } = new();
+
     }
 }

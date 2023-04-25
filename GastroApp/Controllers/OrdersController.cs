@@ -30,6 +30,7 @@ namespace GastroApp.Controllers
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
                 .Include(o => o.User)
+            .Include(o => o.OrderedMeals)
             .Include(o => o.Meals);
             return View(await gastroAppContext.ToListAsync());
         }
@@ -47,6 +48,7 @@ namespace GastroApp.Controllers
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
                 .Include(o => o.User)
+                .Include(o => o.OrderedMeals)
                 .Include(o => o.Meals)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
@@ -78,6 +80,7 @@ namespace GastroApp.Controllers
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
                 .Include(o => o.User)
+                .Include(o => o.OrderedMeals)
                 .Include(o => o.Meals)
                 .FirstOrDefault(o => o.Id == id);
             if (order == null)
@@ -100,7 +103,7 @@ namespace GastroApp.Controllers
             _context.Add(orderedMeal);
             _context.SaveChanges();
 
-            order.UpdatedDateTime = DateTime.UtcNow;
+            order.UpdatedDateTime = orderedMeal.CreatedDateTime;
             order.TotalPrice = order.Meals.Sum(m => m.Price);
 
             if (ModelState.IsValid)
@@ -189,6 +192,8 @@ namespace GastroApp.Controllers
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
+            .Include(o => o.OrderedMeals)
+            .Include(o => o.Meals)
             .Include(o => o.User)
             .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -217,6 +222,8 @@ namespace GastroApp.Controllers
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+            .Include(o => o.OrderedMeals)
             .Include(o => o.User)
             .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -265,6 +272,8 @@ namespace GastroApp.Controllers
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+            .Include(o => o.OrderedMeals)
             .Include(o => o.User)
             .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)

@@ -21,7 +21,8 @@ namespace GastroApp.Models
         public PaymentMethod? PaymentMethod { get; set; }
         [DisplayFormat(DataFormatString = "{0:C}")]
         public float TotalPrice { get; set; }
-        public List<Meal> Meals { get; set; } = new List<Meal>();
+        public List<Meal> Meals { get; set; } = new();
+        public List<OrderedMeal> OrderedMeals { get; set; } = new();
 
         public void SetAsPaid(PaymentMethod paymentMethod)
         {

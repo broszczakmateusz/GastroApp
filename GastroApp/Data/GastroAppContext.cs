@@ -98,11 +98,11 @@ namespace GastroApp.Data
                 .WithMany(m => m.Orders)
                 .UsingEntity<OrderedMeal>(
                     o => o.HasOne(om => om.Meal)
-                    .WithMany()
+                    .WithMany(m => m.OrderedMeals)
                     .HasForeignKey(om => om.MealId),
 
                     o => o.HasOne(om => om.Order)
-                    .WithMany()
+                    .WithMany(o => o.OrderedMeals)
                     .HasForeignKey(om => om.OrderId),
 
                     om =>

@@ -39,6 +39,7 @@
 </div>
     
     <hr />
+
 <table class="table">
     <thead>
         <tr>
@@ -51,21 +52,33 @@
             <th>
                 Price
             </th>
+            <th>
+                Order time
+            </th>
+            <th>
+                Order annotation
+            </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Meals)
+        @foreach (var item in Model.OrderedMeals)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @Html.DisplayFor(modelItem => item.Meal.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Description)
+                    @Html.DisplayFor(modelItem => item.Meal.Description)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Price)
+                    @Html.DisplayFor(modelItem => item.Meal.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedDateTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Annotation)
                 </td>
                 <td>
                     @*<a asp-action="SelectedOrder" asp-route-id="@item.Id">Select</a>*@
