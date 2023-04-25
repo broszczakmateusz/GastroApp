@@ -107,7 +107,9 @@ namespace GastroApp.Data
 
                     om =>
                     {
-                        om.HasKey(x => new { x.OrderId, x.MealId });
+                        om.HasKey(x => x.Id);
+                        om.Property(x => x.OrderId).IsRequired();
+                        om.Property(x => x.MealId).IsRequired();
                         om.Property(x => x.Annotation).HasMaxLength(255);
                         om.Property(x => x.CreatedDateTime).IsRequired().HasDefaultValueSql("now()");
                     }

@@ -3,6 +3,7 @@ using System;
 using GastroApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GastroApp.Migrations
 {
     [DbContext(typeof(GastroAppContext))]
-    partial class GastroAppContextModelSnapshot : ModelSnapshot
+    [Migration("20230425082359_ChangedTypeForMealPrice")]
+    partial class ChangedTypeForMealPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,11 +130,11 @@ namespace GastroApp.Migrations
 
             modelBuilder.Entity("GastroApp.Models.OrderedMeal", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    b.Property<int>("MealId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Annotation")
                         .HasMaxLength(255)
@@ -142,17 +145,9 @@ namespace GastroApp.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<int>("MealId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
+                    b.HasKey("OrderId", "MealId");
 
                     b.HasIndex("MealId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderedMeals");
                 });

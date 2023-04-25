@@ -29,7 +29,8 @@ namespace GastroApp.Controllers
             var gastroAppContext = _context.Orders.Where(o => o.IsPaid == false)
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
-                .Include(o => o.User);
+                .Include(o => o.User)
+            .Include(o => o.Meals);
             return View(await gastroAppContext.ToListAsync());
         }
 
@@ -46,6 +47,7 @@ namespace GastroApp.Controllers
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
                 .Include(o => o.User)
+                .Include(o => o.Meals)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -55,13 +57,75 @@ namespace GastroApp.Controllers
             return View(order);
         }
         [Authorize]
-        private Order? GetDataForNewOrder(Order order)
+        public IActionResult SelectCategory(int? id)
         {
-
-
-            return order;
+            if (id == null)
+            {
+                return Problem("Selected orderId is null");
+            }
+            return RedirectToAction("Index", "Categories", new { orderId = id });
         }
 
+        [Authorize]
+        public IActionResult AddOrderedMealToOrder(int? id, int? mealId)
+        {
+            if (id == null || _context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            var order =  _context.Orders
+                .Include(o => o.Table)
+                    .ThenInclude(t => t.Room)
+                .Include(o => o.User)
+                .Include(o => o.Meals)
+                .FirstOrDefault(o => o.Id == id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            if (mealId == null)
+            {
+                return Problem("MealId is null.");
+            }
+            var meal = _context.Meals
+                .Include(m => m.Category)
+                .FirstOrDefault(m => m.Id == mealId);
+            if (meal == null)
+            {
+                return Problem("Meal is null.");
+            }
+
+            OrderedMeal orderedMeal = new(id.Value, order, mealId.Value, meal);
+            _context.Add(orderedMeal);
+            _context.SaveChanges();
+
+            order.UpdatedDateTime = DateTime.UtcNow;
+            order.TotalPrice = order.Meals.Sum(m => m.Price);
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(order);
+                    _context.SaveChanges();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!OrderExists(order.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("SelectedOrder", "Orders", new { id = id });
+            }
+            return RedirectToAction(nameof(Index));
+
+        }
         // GET: Orders/Create
         [Authorize]
         public IActionResult Create()
@@ -97,7 +161,7 @@ namespace GastroApp.Controllers
             {
                 return Problem("Table is null.");
             }
-            order.SetUserANdTableForNew(user, table);
+            order.SetUserAndTableForNew(user, table);
 
             ModelState.Clear();
             TryValidateModel(order);

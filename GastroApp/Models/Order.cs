@@ -30,7 +30,7 @@ namespace GastroApp.Models
             PaymentMethod = paymentMethod;
             IsPaid = true;
         }
-        public void SetUserANdTableForNew(User user, Table table)
+        public void SetUserAndTableForNew(User user, Table table)
         {
             UserId = user.Id;
             User = user;

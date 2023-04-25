@@ -37,8 +37,47 @@
         </dd>
     </dl>
 </div>
+    
+    <hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Meal
+            </th>
+            <th>
+                Meal details
+            </th>
+            <th>
+                Price
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Meals)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @*<a asp-action="SelectedOrder" asp-route-id="@item.Id">Select</a>*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 <div>
     <a asp-action="ChangeTable" asp-route-id="@Model?.Id">Change table</a> |
     <a asp-action="CloseOrder" asp-route-id="@Model?.Id">Close order</a> |
+    <a asp-action="SelectCategory" asp-route-id="@Model?.Id">Add meal</a> |
     <a asp-action="Index">Back to orders</a>
 </div>
