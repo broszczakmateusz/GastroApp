@@ -50,7 +50,7 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            return RedirectToAction("AddOrderedMealToOrder", "Orders", new { id = orderId, mealId = id });
+            return RedirectToAction("AddOrderedMealToOrder", "SelectedOrder", new { id = orderId, mealId = id });
         }
     }
 }
