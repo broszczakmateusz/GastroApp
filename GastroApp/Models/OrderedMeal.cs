@@ -1,4 +1,6 @@
-﻿namespace GastroApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GastroApp.Models
 {
     public class OrderedMeal
     {
@@ -8,6 +10,7 @@
         public int MealId { get; set; }
         public Meal Meal { get; set; }
         public string? Annotation { get; set; }
+        [UIHint("LocalDate")]
         public DateTime CreatedDateTime { get; set; }
         public OrderedMeal() { }
         public OrderedMeal(int orderId, Order order, int mealId, Meal meal)
