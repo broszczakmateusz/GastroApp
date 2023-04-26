@@ -20,18 +20,15 @@ namespace GastroApp.Controllers
         [Authorize]
         public async Task<IActionResult> SelectedOrder(int? id)
         {
-            if (id == null || _context.Orders == null)
-            {
-                return NotFound();
-            }
-
             var order = await _context.Orders
-                .Include(o => o.Table)
-                    .ThenInclude(t => t.Room)
-                .Include(o => o.User)
-                .Include(o => o.OrderedMeals)
-                .Include(o => o.Meals)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            .Include(o => o.Table)
+                .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+                .ThenInclude(m => m.Category)
+            .Include(o => o.OrderedMeals)
+                .ThenInclude(m => m.Meal.Category)
+            .Include(o => o.User)
+            .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -57,7 +54,7 @@ namespace GastroApp.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> AddOrderedMealToOrder(int? id, int? mealId)
+        public async Task<IActionResult> CreateOrderedMeal(int? id, int? mealId)
         {
             if (id == null || _context.Orders == null)
             {
@@ -65,12 +62,14 @@ namespace GastroApp.Controllers
             }
 
             var order = await _context.Orders
-                .Include(o => o.Table)
-                    .ThenInclude(t => t.Room)
-                .Include(o => o.User)
-                .Include(o => o.OrderedMeals)
-                .Include(o => o.Meals)
-                .FirstOrDefaultAsync(o => o.Id == id);
+            .Include(o => o.Table)
+                .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+                .ThenInclude(m => m.Category)
+            .Include(o => o.OrderedMeals)
+                .ThenInclude(m => m.Meal.Category)
+            .Include(o => o.User)
+            .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -88,11 +87,59 @@ namespace GastroApp.Controllers
             }
 
             OrderedMeal orderedMeal = new(id.Value, order, mealId.Value, meal);
-            _context.Add(orderedMeal);
-            await _context.SaveChangesAsync();
+            if (orderedMeal == null)
+            {
+                return Problem("OrderedMeal is null.");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(orderedMeal);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("AddOrderedMealToOrder", "SelectedOrder", new { orderedMealId = orderedMeal.Id });
+
+            //return RedirectToAction("Create", "OrderedMeals", new { orderedMeal = orderedMeal});
+
+        }
+
+        [Authorize]
+        public async Task<IActionResult> AddOrderedMealToOrder(int? orderedMealId)
+        {
+            if (orderedMealId == null || _context.Orders == null)
+            {
+                return NotFound();
+            }
+            var orderedMeal = await _context.OrderedMeals
+            .Include(om => om.Meal.Category)
+            .Include(om => om.Order)
+            .FirstOrDefaultAsync(m => m.Id == orderedMealId);
+            if (orderedMeal == null)
+            {
+                return Problem("OrderedMeal is null.");
+            }
+
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            var order = await _context.Orders
+            .Include(o => o.Table)
+                .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+                .ThenInclude(m => m.Category)
+            .Include(o => o.OrderedMeals)
+                .ThenInclude(m => m.Meal.Category)
+            .Include(o => o.User)
+            .FirstOrDefaultAsync(m => m.Id == orderedMeal.OrderId);
+            if (order == null)
+            {
+                return NotFound();
+            }
 
             order.UpdatedDateTime = orderedMeal.CreatedDateTime;
-            order.TotalPrice = order.Meals.Sum(m => m.Price);
+            order.TotalPrice = order.OrderedMeals.Sum(m => m.Meal.Price);
 
             if (ModelState.IsValid)
             {
@@ -112,7 +159,7 @@ namespace GastroApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("SelectedOrder", "SelectedOrder", new { id = id });
+                return RedirectToAction("SelectedOrder", "SelectedOrder", new { id = order.Id });
             }
             return RedirectToAction("Index", "Orders");
         }
@@ -130,7 +177,9 @@ namespace GastroApp.Controllers
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
             .Include(o => o.Meals)
+                .ThenInclude(m => m.Category)
             .Include(o => o.OrderedMeals)
+                .ThenInclude(m => m.Meal.Category)
             .Include(o => o.User)
             .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
@@ -167,35 +216,37 @@ namespace GastroApp.Controllers
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
+            .Include(o => o.Meals)
+                .ThenInclude(m => m.Category)
+            .Include(o => o.OrderedMeals)
+                .ThenInclude(m => m.Meal.Category)
             .Include(o => o.User)
             .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (order != null)
+            if (order == null)
             {
-                try
-                {
-                    order.SetAsPaid(paymentMethod);
-
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Index", "Orders");
+                return Problem("Order is null");
             }
-            ViewData["PaymentMethod"] = new SelectList(_context.PaymentMethods, "Id", "Name", order.PaymentMethodId);
-            return View(order);
-        }
 
+            try
+            {
+                order.SetAsPaid(paymentMethod);
+
+                _context.Update(order);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!OrderExists(order.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction("Index", "Orders");
+        }
 
         // GET: SelectedOrder/ChangeTable/5
         [Authorize]

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GastroApp.Data;
 using GastroApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GastroApp.Controllers
 {
@@ -20,6 +21,7 @@ namespace GastroApp.Controllers
         }
 
         // GET: Categories
+        [Authorize]
         public async Task<IActionResult> Index(int? orderId)
         {
 
@@ -31,6 +33,7 @@ namespace GastroApp.Controllers
             ViewData["OrderId"] = orderId;
             return View(await _context.Categories.ToListAsync());
         }
+        [Authorize]
         public IActionResult Select(int? id, int? orderId)
         {   
             if (id == null)

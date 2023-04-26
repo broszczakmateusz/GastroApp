@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GastroApp.Data;
 using GastroApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GastroApp.Controllers
 {
@@ -20,6 +21,7 @@ namespace GastroApp.Controllers
         }
 
         // GET: Meals
+        [Authorize]
         public async Task<IActionResult> Index(int? categoryId, int? orderId)
         {
             if (categoryId == null)
@@ -36,6 +38,7 @@ namespace GastroApp.Controllers
         }
 
         // GET: Meals/Select/5
+        [Authorize]
         public async Task<IActionResult> Select(int? id, int? orderId)
         {
             if (id == null || _context.Meals == null)
@@ -50,7 +53,7 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            return RedirectToAction("AddOrderedMealToOrder", "SelectedOrder", new { id = orderId, mealId = id });
+            return RedirectToAction("CreateOrderedMeal", "SelectedOrder", new { id = orderId, mealId = id });
         }
     }
 }
