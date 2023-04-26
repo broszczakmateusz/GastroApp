@@ -26,6 +26,10 @@ namespace GastroApp.Controllers
             {
                 return Problem("Selected category is null");
             }
+            if (categoryId == null)
+            {
+                return Problem("Selected order is null");
+            }
             ViewData["OrderId"] = orderId;
             var gastroAppContext = _context.Meals.Include(m => m.Category).Where(m => m.CategoryId == categoryId);
             return View(await gastroAppContext.ToListAsync());

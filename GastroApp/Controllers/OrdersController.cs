@@ -58,6 +58,7 @@ namespace GastroApp.Controllers
 
             return View(order);
         }
+        // GET: Categories/5
         [Authorize]
         public IActionResult SelectCategory(int? id)
         {
@@ -69,20 +70,20 @@ namespace GastroApp.Controllers
         }
 
         [Authorize]
-        public IActionResult AddOrderedMealToOrder(int? id, int? mealId)
+        public async Task<IActionResult> AddOrderedMealToOrder(int? id, int? mealId)
         {
             if (id == null || _context.Orders == null)
             {
                 return NotFound();
             }
 
-            var order =  _context.Orders
+            var order = await _context.Orders
                 .Include(o => o.Table)
                     .ThenInclude(t => t.Room)
                 .Include(o => o.User)
                 .Include(o => o.OrderedMeals)
                 .Include(o => o.Meals)
-                .FirstOrDefault(o => o.Id == id);
+                .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null)
             {
                 return NotFound();
@@ -91,9 +92,9 @@ namespace GastroApp.Controllers
             {
                 return Problem("MealId is null.");
             }
-            var meal = _context.Meals
+            var meal = await _context.Meals
                 .Include(m => m.Category)
-                .FirstOrDefault(m => m.Id == mealId);
+                .FirstOrDefaultAsync(m => m.Id == mealId);
             if (meal == null)
             {
                 return Problem("Meal is null.");
@@ -101,7 +102,7 @@ namespace GastroApp.Controllers
 
             OrderedMeal orderedMeal = new(id.Value, order, mealId.Value, meal);
             _context.Add(orderedMeal);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             order.UpdatedDateTime = orderedMeal.CreatedDateTime;
             order.TotalPrice = order.Meals.Sum(m => m.Price);
@@ -111,7 +112,7 @@ namespace GastroApp.Controllers
                 try
                 {
                     _context.Update(order);
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -127,7 +128,6 @@ namespace GastroApp.Controllers
                 return RedirectToAction("SelectedOrder", "Orders", new { id = id });
             }
             return RedirectToAction(nameof(Index));
-
         }
         // GET: Orders/Create
         [Authorize]
@@ -139,10 +139,7 @@ namespace GastroApp.Controllers
             return View();
         }
 
-
         // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -153,13 +150,13 @@ namespace GastroApp.Controllers
             {
                 return Problem("User is null.");
             }
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 return Problem("User is null.");
             }
 
-            var table = _context.Tables.Include(t => t.Room).FirstOrDefault(t => t.Id == order.TableId);
+            var table = await _context.Tables.Include(t => t.Room).FirstOrDefaultAsync(t => t.Id == order.TableId);
             if (table == null)
             {
                 return Problem("Table is null.");
@@ -175,7 +172,7 @@ namespace GastroApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(SelectedOrder), new { Id = order.Id });
             }
-            var Tables = _context.Tables.Include(t => t.Room).ToList();
+            var Tables = await _context.Tables.Include(t => t.Room).ToListAsync();
             ViewData["TableId"] = new SelectList(Tables, "Id", "RoomAndTable", order.TableId);
             return View(order);
         }
@@ -201,14 +198,12 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            var Tables = _context.Tables.Include(t => t.Room).ToList();
+            var Tables = await _context.Tables.Include(t => t.Room).ToListAsync();
             ViewData["TableId"] = new SelectList(Tables, "Id", "RoomAndTable", order.TableId);
             return View(order);
         }
 
         // POST: Orders/ChangeTable/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -255,7 +250,7 @@ namespace GastroApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            var Tables = _context.Tables.Include(t => t.Room).ToList();
+            var Tables = await _context.Tables.Include(t => t.Room).ToListAsync();
             ViewData["TableId"] = new SelectList(Tables, "Id", "RoomAndTable", order.TableId);
             return View(order);
         }
@@ -281,7 +276,7 @@ namespace GastroApp.Controllers
                 return NotFound();
             }
 
-            ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Name", order.PaymentMethodId);
+            ViewData["PaymentMethodId"] = new SelectList(await _context.PaymentMethods, "Id", "Name", order.PaymentMethodId);
             return View(order);
         }
 

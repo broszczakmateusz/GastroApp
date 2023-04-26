@@ -37,6 +37,10 @@ namespace GastroApp.Controllers
             {
                 return Problem("Selected categoryId is null");
             }
+            if (orderId == null)
+            {
+                return Problem("Selected orderId is null");
+            }
             return RedirectToAction("Index", "Meals", new { categoryId = id, orderId = orderId});
         }
     }
