@@ -276,10 +276,9 @@ namespace GastroApp.Controllers
                 return NotFound();
             }
 
-            ViewData["PaymentMethodId"] = new SelectList(await _context.PaymentMethods, "Id", "Name", order.PaymentMethodId);
+            ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods, "Id", "Name", order.PaymentMethodId);
             return View(order);
         }
-
 
         // POST: Orders/CloseOrder/5
         [HttpPost, ActionName("CloseOrder")]
