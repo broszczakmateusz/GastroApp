@@ -12,10 +12,32 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<GastroAppContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<GastroAppContext>();
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<GastroAppContext>();
 
 builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<GastroAppContext>();
+
+builder.Services.AddAuthorization(options =>
+{   
+    options.AddPolicy("RequireAdminRole",
+         policy => policy.RequireRole("Admin"));
+
+    options.AddPolicy("RequireRestaurantManagerRole",
+    policy => policy.RequireRole("RestaurantManager"));
+
+    options.AddPolicy("RequireWaiterRole",
+        policy => policy.RequireRole("Waiter"));
+
+    options.AddPolicy("RequireWaiterManagerRole",
+        policy => policy.RequireRole("WaiterManager"));
+
+    options.AddPolicy("RequireChiefRole",
+        policy => policy.RequireRole("Chief"));
+
+
+});
 
 var app = builder.Build();
 

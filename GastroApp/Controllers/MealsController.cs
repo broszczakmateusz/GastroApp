@@ -21,7 +21,7 @@ namespace GastroApp.Controllers
         }
 
         // GET: Meals
-        [Authorize]
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter, Chief")]
         public async Task<IActionResult> Index(int? categoryId, int? orderId)
         {
             if (categoryId == null)
@@ -38,7 +38,7 @@ namespace GastroApp.Controllers
         }
 
         // GET: Meals/Select/5
-        [Authorize]
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter, Chief")]
         public async Task<IActionResult> Select(int? id, int? orderId)
         {
             if (id == null || _context.Meals == null)

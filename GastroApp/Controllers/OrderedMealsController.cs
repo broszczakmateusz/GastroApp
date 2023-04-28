@@ -20,7 +20,7 @@ namespace GastroApp.Controllers
         // POST: Orders/Create
         //[HttpPost]
         //[ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter")]
         public IActionResult Create([Bind("Id,OrderId,Order,MealId,Meal,Annotation,CreatedDateTime")] OrderedMeal orderedMeal)
         {
             if (orderedMeal == null)

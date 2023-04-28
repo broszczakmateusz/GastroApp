@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GastroApp.Controllers
 {
+    [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter")]
     public class SelectedOrderController : Controller
     {
         private readonly GastroAppContext _context;
@@ -17,7 +18,6 @@ namespace GastroApp.Controllers
         }
 
         // GET: SelectedOrder/SelectedOrder/5
-        [Authorize]
         public async Task<IActionResult> SelectedOrder(int? id)
         {
             var order = await _context.Orders
@@ -36,14 +36,12 @@ namespace GastroApp.Controllers
             return View(order);
         }
 
-        [Authorize]
         public IActionResult RedirectToOrdersIndex()
         {
             return RedirectToAction("Index", "Orders");
         }
 
         // GET: Categories/5
-        [Authorize]
         public IActionResult SelectCategory(int? id)
         {
             if (id == null)
@@ -53,7 +51,6 @@ namespace GastroApp.Controllers
             return RedirectToAction("Index", "Categories", new { orderId = id });
         }
 
-        [Authorize]
         public async Task<IActionResult> CreateOrderedMeal(int? id, int? mealId)
         {
             if (id == null || _context.Orders == null)
@@ -103,7 +100,6 @@ namespace GastroApp.Controllers
 
         }
 
-        [Authorize]
         public async Task<IActionResult> AddOrderedMealToOrder(int? orderedMealId)
         {
             if (orderedMealId == null || _context.Orders == null)
@@ -165,7 +161,6 @@ namespace GastroApp.Controllers
         }
 
         // GET: SelectedOrder/CloseOrder/5
-        [Authorize]
         public async Task<IActionResult> CloseOrder(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -194,7 +189,6 @@ namespace GastroApp.Controllers
         // POST: SelectedOrder/CloseOrder/5
         [HttpPost, ActionName("CloseOrder")]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> CloseOrderConfirmed(int id, Order selectedOrder)
         {
             if (_context.Orders == null)
@@ -249,7 +243,6 @@ namespace GastroApp.Controllers
         }
 
         // GET: SelectedOrder/ChangeTable/5
-        [Authorize]
         public async Task<IActionResult> ChangeTable(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -279,7 +272,6 @@ namespace GastroApp.Controllers
         // POST: SelectedOrder/ChangeTable/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> ChangeTable(int id, Order updatedOrder)
         {
             if (id != updatedOrder.Id)

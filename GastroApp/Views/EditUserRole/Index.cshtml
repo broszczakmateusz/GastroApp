@@ -1,0 +1,43 @@
+﻿@using System.Globalization;
+@model IEnumerable<UserWithRole>;
+
+@{
+    ViewData["Title"] = "Manage roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h3>Manage roles</h3>
+
+<table class="table">
+    <thead>
+        <tr>            
+            <th>
+                Email
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Role
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Email)
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.FirstName) @Html.DisplayFor(modelItem => item.User.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    <a asp-action="EditRole" asp-route-id="@item.User.Id">Edit role</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

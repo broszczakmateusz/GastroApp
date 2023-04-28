@@ -13,6 +13,7 @@ using GastroApp.Migrations;
 
 namespace GastroApp.Controllers
 {
+    [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter")]
     public class OrdersController : Controller
     {
         private readonly GastroAppContext _context;
@@ -23,7 +24,6 @@ namespace GastroApp.Controllers
         }
 
         // GET: Orders
-        [Authorize]
         public async Task<IActionResult> Index()
         {
             var gastroAppContext = _context.Orders.Where(o => o.IsPaid == false)
@@ -35,7 +35,6 @@ namespace GastroApp.Controllers
             return View(await gastroAppContext.ToListAsync());
         }
         // GET: SelectedOrder/5
-        [Authorize]
         public IActionResult SelectOrder(int? id)
         {
             if (id == null)
@@ -46,7 +45,6 @@ namespace GastroApp.Controllers
         }
 
         // GET: Orders/Create
-        [Authorize]
         public IActionResult Create()
         {
             var Tables = _context.Tables.Include(t => t.Room).ToList();
@@ -58,7 +56,6 @@ namespace GastroApp.Controllers
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> Create([Bind("Id,TableId")] Order order)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

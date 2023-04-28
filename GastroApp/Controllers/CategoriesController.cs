@@ -21,10 +21,10 @@ namespace GastroApp.Controllers
         }
 
         // GET: Categories
-        [Authorize]
+
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter, Chief")]
         public async Task<IActionResult> Index(int? orderId)
         {
-
             if (orderId == null)
             {
                 Problem("Entity set 'GastroAppContext.Categories'  is null.");
@@ -33,7 +33,7 @@ namespace GastroApp.Controllers
             ViewData["OrderId"] = orderId;
             return View(await _context.Categories.ToListAsync());
         }
-        [Authorize]
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter")]
         public IActionResult Select(int? id, int? orderId)
         {   
             if (id == null)
