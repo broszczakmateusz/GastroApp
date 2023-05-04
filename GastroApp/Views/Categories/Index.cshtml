@@ -1,31 +1,37 @@
 ﻿@model IEnumerable<GastroApp.Models.Category>
 
 @{
-    ViewData["Title"] = "Select category";
+    ViewData["Title"] = "Categories";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Select category</h1>
+<h3>Categories</h3>
 
+<p>
+    <a asp-action="Create">Create category</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                Category
+                Category name
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                    <a asp-action="Select" asp-route-id="@item.Id" asp-route-orderId="@ViewData["OrderId"]">Select</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

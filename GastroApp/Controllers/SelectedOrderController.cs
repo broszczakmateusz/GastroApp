@@ -48,7 +48,7 @@ namespace GastroApp.Controllers
             {
                 return Problem("Selected orderId is null");
             }
-            return RedirectToAction("Index", "Categories", new { orderId = id });
+            return RedirectToAction("SelectIndex", "Categories", new { orderId = id });
         }
 
         public async Task<IActionResult> CreateOrderedMeal(int? id, int? mealId)
