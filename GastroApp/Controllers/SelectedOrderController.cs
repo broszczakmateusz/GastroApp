@@ -115,11 +115,14 @@ namespace GastroApp.Controllers
                 return Problem("OrderedMeal is null.");
             }
 
-            if (_context.Orders == null)
+            if (orderedMeal.OrderId == null)
             {
                 return NotFound();
             }
-
+            return RedirectToAction("UpdateOrderAfterOrderedMealsChange", "SelectedOrder", new { orderId = orderedMeal.OrderId });
+        }
+        public async Task<IActionResult> UpdateOrderAfterOrderedMealsChange(int? orderId)
+        {
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
@@ -128,13 +131,13 @@ namespace GastroApp.Controllers
             .Include(o => o.OrderedMeals)
                 .ThenInclude(m => m.Meal.Category)
             .Include(o => o.User)
-            .FirstOrDefaultAsync(m => m.Id == orderedMeal.OrderId);
+            .FirstOrDefaultAsync(m => m.Id == orderId);
             if (order == null)
             {
                 return NotFound();
             }
 
-            order.UpdatedDateTime = orderedMeal.CreatedDateTime;
+            order.UpdatedDateTime = DateTime.UtcNow;
             order.TotalPrice = order.OrderedMeals.Sum(m => m.Meal.Price);
 
             if (ModelState.IsValid)
@@ -158,6 +161,52 @@ namespace GastroApp.Controllers
                 return RedirectToAction("SelectedOrder", "SelectedOrder", new { id = order.Id });
             }
             return RedirectToAction("Index", "Orders");
+
+        }
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager")]
+        public async Task<IActionResult> RemoveOrderedMealFromOrder(int? orderedMealId)
+        {
+            if (orderedMealId == null || _context.Orders == null)
+            {
+                return NotFound();
+            }
+            var orderedMeal = await _context.OrderedMeals
+            .Include(om => om.Meal.Category)
+            .Include(om => om.Order)
+            .FirstOrDefaultAsync(m => m.Id == orderedMealId);
+            if (orderedMeal == null)
+            {
+                return Problem("OrderedMeal is null.");
+            }
+            return View(orderedMeal);
+        }
+
+        [HttpPost, ActionName("RemoveOrderedMealFromOrder")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager")]
+        public async Task<IActionResult> RemoveOrderedMealFromOrderConfirmed(int id)
+        {
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+            var orderedMeal = await _context.OrderedMeals
+            .Include(om => om.Meal.Category)
+            .Include(om => om.Order)
+            .FirstAsync(m => m.Id == id);
+            if (orderedMeal == null)
+            {
+                return Problem("OrderedMeal is null.");
+            }
+
+            var orderId = orderedMeal.OrderId;
+
+            if (ModelState.IsValid)
+            {
+                _context.Remove(orderedMeal);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("UpdateOrderAfterOrderedMealsChange", "SelectedOrder", new { orderId = orderId });
         }
 
         // GET: SelectedOrder/CloseOrder/5
