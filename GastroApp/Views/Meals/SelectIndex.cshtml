@@ -1,15 +1,12 @@
 ﻿@model IEnumerable<GastroApp.Models.Meal>
 
 @{
-    ViewData["Title"] = "Meals";
+    ViewData["Title"] = "Select meal";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3>Meals</h3>
+<h4>Select meal</h4>
 
-<p>
-    <a asp-action="Create">Create new meal</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -23,7 +20,7 @@
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.VATRate)
+                VAT
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Category)
@@ -50,9 +47,7 @@
                 @Html.DisplayFor(modelItem => item.Category.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Select" asp-route-id="@item.Id" asp-route-orderId="@ViewData["OrderId"]">Select</a>
             </td>
         </tr>
 }
