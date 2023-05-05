@@ -53,7 +53,9 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            return RedirectToAction("CreateOrderedMeal", "SelectedOrder", new { id = orderId, mealId = id });
+            return RedirectToAction("Create", "OrderedMeals", new { orderId = orderId, mealId = id });
+
+            //return RedirectToAction("CreateOrderedMeal", "SelectedOrder", new { id = orderId, mealId = id });
         }
         // GET: Meals
         public async Task<IActionResult> Index()

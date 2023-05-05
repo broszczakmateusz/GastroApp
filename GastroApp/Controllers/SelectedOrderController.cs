@@ -51,13 +51,8 @@ namespace GastroApp.Controllers
             return RedirectToAction("SelectIndex", "Categories", new { orderId = id });
         }
 
-        public async Task<IActionResult> CreateOrderedMeal(int? id, int? mealId)
+        public async Task<IActionResult> UpdateOrderAfterOrderedMealsChange(int? id)
         {
-            if (id == null || _context.Orders == null)
-            {
-                return NotFound();
-            }
-
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
@@ -71,74 +66,8 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            if (mealId == null)
-            {
-                return Problem("MealId is null.");
-            }
-            var meal = await _context.Meals
-                .Include(m => m.Category)
-                .FirstOrDefaultAsync(m => m.Id == mealId);
-            if (meal == null)
-            {
-                return Problem("Meal is null.");
-            }
 
-            OrderedMeal orderedMeal = new(id.Value, order, mealId.Value, meal);
-            if (orderedMeal == null)
-            {
-                return Problem("OrderedMeal is null.");
-            }
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(orderedMeal);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("AddOrderedMealToOrder", "SelectedOrder", new { orderedMealId = orderedMeal.Id });
-
-            //return RedirectToAction("Create", "OrderedMeals", new { orderedMeal = orderedMeal});
-
-        }
-
-        public async Task<IActionResult> AddOrderedMealToOrder(int? orderedMealId)
-        {
-            if (orderedMealId == null || _context.Orders == null)
-            {
-                return NotFound();
-            }
-            var orderedMeal = await _context.OrderedMeals
-            .Include(om => om.Meal.Category)
-            .Include(om => om.Order)
-            .FirstOrDefaultAsync(m => m.Id == orderedMealId);
-            if (orderedMeal == null)
-            {
-                return Problem("OrderedMeal is null.");
-            }
-
-            if (orderedMeal.OrderId == null)
-            {
-                return NotFound();
-            }
-            return RedirectToAction("UpdateOrderAfterOrderedMealsChange", "SelectedOrder", new { orderId = orderedMeal.OrderId });
-        }
-        public async Task<IActionResult> UpdateOrderAfterOrderedMealsChange(int? orderId)
-        {
-            var order = await _context.Orders
-            .Include(o => o.Table)
-                .ThenInclude(t => t.Room)
-            .Include(o => o.Meals)
-                .ThenInclude(m => m.Category)
-            .Include(o => o.OrderedMeals)
-                .ThenInclude(m => m.Meal.Category)
-            .Include(o => o.User)
-            .FirstOrDefaultAsync(m => m.Id == orderId);
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            order.UpdatedDateTime = DateTime.UtcNow;
-            order.TotalPrice = order.OrderedMeals.Sum(m => m.Meal.Price);
+            order.UpdateTotalPrice();
 
             if (ModelState.IsValid)
             {
@@ -161,52 +90,6 @@ namespace GastroApp.Controllers
                 return RedirectToAction("SelectedOrder", "SelectedOrder", new { id = order.Id });
             }
             return RedirectToAction("Index", "Orders");
-
-        }
-        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager")]
-        public async Task<IActionResult> RemoveOrderedMealFromOrder(int? orderedMealId)
-        {
-            if (orderedMealId == null || _context.Orders == null)
-            {
-                return NotFound();
-            }
-            var orderedMeal = await _context.OrderedMeals
-            .Include(om => om.Meal.Category)
-            .Include(om => om.Order)
-            .FirstOrDefaultAsync(m => m.Id == orderedMealId);
-            if (orderedMeal == null)
-            {
-                return Problem("OrderedMeal is null.");
-            }
-            return View(orderedMeal);
-        }
-
-        [HttpPost, ActionName("RemoveOrderedMealFromOrder")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, RestaurantManager, WaiterManager")]
-        public async Task<IActionResult> RemoveOrderedMealFromOrderConfirmed(int id)
-        {
-            if (_context.Orders == null)
-            {
-                return NotFound();
-            }
-            var orderedMeal = await _context.OrderedMeals
-            .Include(om => om.Meal.Category)
-            .Include(om => om.Order)
-            .FirstAsync(m => m.Id == id);
-            if (orderedMeal == null)
-            {
-                return Problem("OrderedMeal is null.");
-            }
-
-            var orderId = orderedMeal.OrderId;
-
-            if (ModelState.IsValid)
-            {
-                _context.Remove(orderedMeal);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("UpdateOrderAfterOrderedMealsChange", "SelectedOrder", new { orderId = orderId });
         }
 
         // GET: SelectedOrder/CloseOrder/5
@@ -238,24 +121,16 @@ namespace GastroApp.Controllers
         // POST: SelectedOrder/CloseOrder/5
         [HttpPost, ActionName("CloseOrder")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CloseOrderConfirmed(int id, Order selectedOrder)
+        public async Task<IActionResult> CloseOrderConfirmed(int? id, int? paymentMethodId)
         {
-            if (_context.Orders == null)
+            if (id == null || _context.Orders == null)
             {
-                return Problem("Entity set 'GastroAppContext.Orders'  is null.");
+                return NotFound();
             }
-
-            var paymentMethodId = selectedOrder.PaymentMethodId;
-            if (paymentMethodId == null)
+            if (paymentMethodId == null || _context.PaymentMethods == null)
             {
-                return Problem("Payment method is null.");
+                return NotFound();
             }
-            PaymentMethod? paymentMethod = _context.PaymentMethods.Find(paymentMethodId);
-            if (paymentMethod == null)
-            {
-                return Problem("Payment method is null.");
-            }
-
             var order = await _context.Orders
             .Include(o => o.Table)
                 .ThenInclude(t => t.Room)
@@ -267,28 +142,37 @@ namespace GastroApp.Controllers
             .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
-                return Problem("Order is null");
+                return NotFound();
             }
 
-            try
+            PaymentMethod? paymentMethod = await _context.PaymentMethods.FindAsync(paymentMethodId);
+            if (paymentMethod == null)
             {
-                order.SetAsPaid(paymentMethod);
+                return Problem("Payment method is null.");
+            }
+            order.SetAsPaid(paymentMethod);
 
-                _context.Update(order);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+            if (ModelState.IsValid)
             {
-                if (!OrderExists(order.Id))
+                try
                 {
-                    return NotFound();
+                    _context.Update(order);
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!OrderExists(order.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
+                return RedirectToAction("Index", "Orders");
             }
-            return RedirectToAction("Index", "Orders");
+            return View(order);
         }
 
         // GET: SelectedOrder/ChangeTable/5
@@ -321,9 +205,13 @@ namespace GastroApp.Controllers
         // POST: SelectedOrder/ChangeTable/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeTable(int id, Order updatedOrder)
+        public async Task<IActionResult> ChangeTable(int? id, int? tableId)
         {
-            if (id != updatedOrder.Id)
+            if (id == null || _context.Orders == null)
+            {
+                return NotFound();
+            }
+            if (tableId == null || _context.Tables == null)
             {
                 return NotFound();
             }
@@ -342,7 +230,7 @@ namespace GastroApp.Controllers
             {
                 return NotFound();
             }
-            order.TableId = updatedOrder.TableId;
+            order.TableId = tableId.Value;
             ModelState.Clear();
             TryValidateModel(order);
 

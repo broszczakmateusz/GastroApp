@@ -44,9 +44,6 @@
     <thead>
         <tr>
             <th>
-                Id
-            </th>
-            <th>
                 Meal
             </th>
             <th>
@@ -69,9 +66,6 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => item.Meal.Name)
                 </td>
                 <td>
@@ -87,7 +81,7 @@
                     @Html.DisplayFor(modelItem => item.Annotation)
                 </td>
                 <td>
-                    <a asp-action="RemoveOrderedMealFromOrder" asp-route-orderedMealId="@item?.Id">Delete</a>
+                    <a asp-action="RemoveFromOrder" asp-controller="OrderedMeals" asp-route-id="@item?.Id">Delete</a>
                 </td>
             </tr>
         }

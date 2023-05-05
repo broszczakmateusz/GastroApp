@@ -38,7 +38,7 @@
         </dd>
     </dl>
     
-    <form asp-action="RemoveOrderedMealFromOrder">
+    <form asp-action="RemoveFromOrder" asp-controller="OrderedMeals">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="SelectedOrder" asp-route-id="@Model?.OrderId">Back to order</a>

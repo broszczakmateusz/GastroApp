@@ -37,5 +37,10 @@ namespace GastroApp.Models
             User = user;
             Table = table;
         }
+        public void UpdateTotalPrice()
+        {
+            UpdatedDateTime = DateTime.UtcNow;
+            TotalPrice = OrderedMeals.Sum(m => m.Meal.Price);
+        }
     }
 }

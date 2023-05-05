@@ -33,6 +33,7 @@ namespace GastroApp.Controllers
             return View(await _context.Categories.ToListAsync());
         }
 
+        // GET: Categories/5
         [Authorize(Roles = "Admin, RestaurantManager, WaiterManager, Waiter")]
         public IActionResult Select(int? id, int? orderId)
         {   
